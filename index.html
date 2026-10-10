@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ConvertLab – Unit Converter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--acc:#2F5BFF;--bg:#EEF1F6;--panel:#fff;--ink:#0D1220;--mute:#5D6679;--line:#D6DBE6;
+--font:'Bricolage Grotesque',system-ui,-apple-system,'Segoe UI',sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);min-height:100vh}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 20px 56px}
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.logo svg{width:44px;height:44px;transition:fill .5s}
+h1{font-size:clamp(30px,5vw,44px);font-weight:800;letter-spacing:-.035em;margin:0}
+h1 span{color:var(--acc);transition:color .5s}
+.logo p{margin:0 0 0 auto;color:var(--mute);max-width:260px;text-align:right;font-size:15px}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+nav button{font:inherit;font-weight:600;padding:10px 18px 10px 14px;border:2px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;cursor:pointer;display:flex;align-items:center;gap:8px}
+nav button i{width:12px;height:12px;border-radius:50%;background:var(--c)}
+nav button:hover{border-color:var(--c)}
+nav button[aria-selected=true]{background:var(--c);border-color:var(--c);color:#fff}
+nav button[aria-selected=true] i{background:#fff}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.stage{display:grid;grid-template-columns:1.05fr 1fr;gap:18px}
+.scope{background:var(--acc);color:#fff;border-radius:28px;padding:26px;position:relative;overflow:hidden;min-height:380px;transition:background .5s;display:flex;flex-direction:column}
+.scope h2{margin:0;font-size:clamp(34px,6vw,60px);font-weight:800;letter-spacing:-.04em;line-height:1}
+.scope .sub{margin:6px 0 0;opacity:.85;font-size:15px}
+.scope svg{flex:1;width:100%;margin-top:10px;overflow:visible}
+.inst{display:none}.inst.on{display:block}
+.inst *{transition:transform .6s cubic-bezier(.3,1.3,.5,1),opacity .5s}
+.card{background:var(--panel);border-radius:28px;padding:26px;display:flex;flex-direction:column;gap:14px}
+label{display:block;font-size:14px;color:var(--mute);margin-bottom:6px;font-weight:600}
+input,select{width:100%;font:inherit;padding:12px 14px;border:2px solid var(--line);border-radius:14px;background:var(--bg);color:var(--ink)}
+input{font-size:28px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+input:focus{border-color:var(--acc);outline:none}
+select{font-size:16px;margin-top:8px;cursor:pointer}
+#swap{font:inherit;font-size:22px;align-self:center;width:46px;height:46px;border-radius:50%;border:none;background:var(--ink);color:#fff;cursor:pointer;transition:transform .3s}
+#swap:hover{transform:rotate(180deg)}
+.err{color:#C0392B;font-size:14px;min-height:18px;margin:0}
+.big{margin:0;font-size:clamp(20px,3.4vw,28px);font-weight:600;letter-spacing:-.02em;word-break:break-word}
+.big small{color:var(--acc);font-weight:800}
+h3{font-size:18px;margin:30px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.grid button{font:inherit;text-align:left;padding:12px 14px;border:2px solid transparent;border-left:6px solid var(--acc);background:var(--panel);color:var(--ink);border-radius:14px;cursor:pointer;transition:transform .15s}
+.grid button:hover{transform:translateY(-3px)}
+.grid button.sel{border-color:var(--acc);border-left-width:6px}
+.grid b{display:block;font-size:18px;font-variant-numeric:tabular-nums;word-break:break-all}
+.grid span{color:var(--mute);font-size:13px}
+footer{margin-top:36px;color:var(--mute);font-size:14px}
+@media(max-width:760px){.stage{grid-template-columns:1fr}.logo p{display:none}.scope{min-height:320px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M18 4h12v4h-2v11l11 20a5 5 0 0 1-4.4 7.4H13.4A5 5 0 0 1 9 39l11-20V8h-2z" fill="var(--acc)"/><path d="M15 32h18l4 7a2 2 0 0 1-1.7 3H12.7A2 2 0 0 1 11 39z" fill="#fff" opacity=".45"/></svg>
+    <h1>Convert<span>Lab</span></h1>
+    <p>Pick a category, type a number, watch it move.</p>
+  </div>
+  <nav id="tabs" role="tablist" aria-label="Categories"></nav>
+
+  <div class="stage">
+    <section class="scope" aria-hidden="true">
+      <h2 id="ttl">Length</h2>
+      <p class="sub" id="sub"></p>
+      <svg viewBox="0 0 400 270">
+        <g class="inst" id="i-Length">
+          <rect x="15" y="110" width="370" height="90" rx="12" fill="#fff"/>
+          <g id="ticks" stroke="#0D1220"></g>
+          <g id="mk"><path d="M0 100l-12-26h24z" fill="#0D1220"/><rect x="-2" y="100" width="4" height="100" fill="#0D1220"/></g>
+        </g>
+        <g class="inst" id="i-Mass">
+          <path d="M200 120L160 250h80z" fill="#fff" opacity=".9"/>
+          <g id="beam" style="transform-origin:200px 100px"><rect x="40" y="94" width="320" height="12" rx="6" fill="#fff"/><circle cx="200" cy="100" r="10" fill="#0D1220"/>
+            <path d="M60 106L30 190h60zM340 106l-30 84h60z" fill="none" stroke="#fff" stroke-width="3"/><rect x="25" y="188" width="70" height="10" rx="5" fill="#fff"/><rect x="305" y="188" width="70" height="10" rx="5" fill="#fff"/></g>
+        </g>
+        <g class="inst" id="i-Pressure">
+          <path d="M40 220a160 160 0 0 1 320 0z" fill="#fff"/>
+          <g id="gt" stroke="#0D1220" stroke-width="3"></g>
+          <g id="needle" style="transform-origin:200px 220px"><path d="M194 220L200 72l6 148z" fill="#0D1220"/></g>
+          <circle cx="200" cy="220" r="14" fill="#0D1220"/>
+        </g>
+        <g class="inst" id="i-Energy">
+          <g id="rings" fill="none" stroke="#fff" stroke-width="3"><circle cx="200" cy="135" r="90"/><circle cx="200" cy="135" r="125" opacity=".6"/><circle cx="200" cy="135" r="160" opacity=".3"/></g>
+          <g id="bolt" style="transform-origin:200px 135px"><path d="M225 30L130 150h58l-18 95 100-125h-60z" fill="#fff"/></g>
+        </g>
+        <g class="inst" id="i-Temperature">
+          <rect x="170" y="20" width="60" height="190" rx="30" fill="#fff"/>
+          <circle cx="200" cy="228" r="40" fill="#fff"/>
+          <rect id="mer" x="188" y="40" width="24" height="190" rx="12" fill="#0D1220" style="transform-origin:200px 230px"/>
+          <circle cx="200" cy="228" r="28" fill="#0D1220"/>
+        </g>
+      </svg>
+    </section>
+
+    <main class="card">
+      <div><label for="v">Value</label><input id="v" type="text" inputmode="decimal" value="1" autocomplete="off"><select id="from" aria-label="From unit"></select></div>
+      <button id="swap" aria-label="Swap units" title="Swap units">⇅</button>
+      <div><label for="out">Result</label><input id="out" type="text" readonly><select id="to" aria-label="To unit"></select></div>
+      <p class="err" id="err" role="alert"></p>
+      <p class="big" id="big"></p>
+    </main>
+  </div>
+
+  <h3>Same value, every unit</h3>
+  <div class="grid" id="all"></div>
+  <footer>Click any unit to make it the target. ConvertLab runs fully in your browser.</footer>
+</div>
+<script>
+const DATA={
+ Length:{col:'#2F5BFF',sub:'From millimetres to miles',lo:-3,hi:4,units:{mm:[.001,'millimetre'],cm:[.01,'centimetre'],m:[1,'metre'],km:[1000,'kilometre'],in:[.0254,'inch'],ft:[.3048,'foot'],yd:[.9144,'yard'],mi:[1609.344,'mile'],nmi:[1852,'nautical mile']}},
+ Mass:{col:'#D98200',sub:'The balance tips with the weight',lo:-6,hi:4,units:{mg:[1e-6,'milligram'],g:[.001,'gram'],kg:[1,'kilogram'],t:[1000,'tonne'],oz:[.028349523125,'ounce'],lb:[.45359237,'pound'],st:[6.35029318,'stone']}},
+ Pressure:{col:'#E4287C',sub:'The needle follows the pascals',lo:0,hi:8,units:{Pa:[1,'pascal'],kPa:[1e3,'kilopascal'],MPa:[1e6,'megapascal'],bar:[1e5,'bar'],mbar:[100,'millibar'],atm:[101325,'atmosphere'],psi:[6894.757293168,'pound/sq in'],mmHg:[133.322387415,'mm of mercury'],torr:[101325/760,'torr']}},
+ Energy:{col:'#119A62',sub:'More joules, more spark',lo:-3,hi:9,units:{J:[1,'joule'],kJ:[1e3,'kilojoule'],MJ:[1e6,'megajoule'],cal:[4.184,'calorie'],kcal:[4184,'kilocalorie'],Wh:[3600,'watt-hour'],kWh:[3.6e6,'kilowatt-hour'],BTU:[1055.05585262,'British thermal unit'],eV:[1.602176634e-19,'electronvolt'],'ft·lbf':[1.3558179483314,'foot-pound force']}},
+ Temperature:{col:'#F0482A',sub:'Freezing to boiling and beyond',temp:true,units:{'°C':[0,'Celsius'],'°F':[0,'Fahrenheit'],K:[0,'Kelvin'],'°R':[0,'Rankine']}}
+};
+const toK={'°C':x=>x+273.15,'°F':x=>(x-32)*5/9+273.15,K:x=>x,'°R':x=>x*5/9};
+const fromK={'°C':k=>k-273.15,'°F':k=>(k-273.15)*9/5+32,K:k=>k,'°R':k=>k*9/5};
+const conv=(c,x,a,b)=>DATA[c].temp?fromK[b](toK[a](x)):x*DATA[c].units[a][0]/DATA[c].units[b][0];
+function fmt(n){if(!isFinite(n))return '—';if(n===0)return '0';const a=Math.abs(n);
+ if(a>=1e12||a<1e-6)return n.toExponential(6).replace(/\.?0+e/,'e');return String(parseFloat(n.toPrecision(10)));}
+const $=id=>document.getElementById(id),clamp=x=>Math.max(0,Math.min(1,x));
+let cat='Length';
+const tabs=$('tabs'),v=$('v'),from=$('from'),to=$('to'),out=$('out'),big=$('big'),all=$('all'),err=$('err');
+Object.keys(DATA).forEach(k=>{const b=document.createElement('button');b.innerHTML='<i></i>'+k;b.dataset.k=k;b.style.setProperty('--c',DATA[k].col);b.setAttribute('role','tab');b.onclick=()=>setCat(k);tabs.appendChild(b)});
+// static instrument ticks
+(()=>{let s='';for(let i=0;i<=36;i++){const x=20+i*10,h=i%10==0?44:i%5==0?30:18;s+=`<line x1="${x}" y1="110" x2="${x}" y2="${110+h}" stroke-width="2"/>`}$('ticks').innerHTML=s;
+ let g='';for(let i=0;i<=10;i++){const a=(-90+i*18)*Math.PI/180,r1=140,r2=i%5==0?118:128;g+=`<line x1="${200+Math.sin(a)*r1}" y1="${220-Math.cos(a)*r1}" x2="${200+Math.sin(a)*r2}" y2="${220-Math.cos(a)*r2}"/>`}$('gt').innerHTML=g})();
+function fill(sel,def){sel.innerHTML='';Object.entries(DATA[cat].units).forEach(([u,[,n]])=>{const o=document.createElement('option');o.value=u;o.textContent=`${u} – ${n}`;sel.appendChild(o)});sel.value=def}
+const DEF={Length:['m','ft'],Mass:['kg','lb'],Pressure:['bar','psi'],Energy:['kJ','kcal'],Temperature:['°C','°F']};
+function setCat(k){cat=k;const d=DATA[k];
+ document.documentElement.style.setProperty('--acc',d.col);
+ [...tabs.children].forEach(b=>b.setAttribute('aria-selected',b.dataset.k===k));
+ document.querySelectorAll('.inst').forEach(g=>g.classList.toggle('on',g.id==='i-'+k));
+ $('ttl').textContent=k;$('sub').textContent=d.sub;
+ fill(from,DEF[k][0]);fill(to,DEF[k][1]);update();}
+function level(x){const d=DATA[cat];
+ if(d.temp)return clamp((fromK['°C'](toK[from.value](x))+50)/200);
+ const base=Math.abs(x*d.units[from.value][0]);return clamp((Math.log10(base||1e-12)-d.lo)/(d.hi-d.lo));}
+function drive(t){
+ $('mk').style.transform=`translateX(${20+t*360}px)`;
+ $('beam').style.transform=`rotate(${(t-.5)*44}deg)`;
+ $('needle').style.transform=`rotate(${-90+t*180}deg)`;
+ $('bolt').style.transform=`scale(${.7+t*.4})`;
+ [...$('rings').children].forEach((c,i)=>c.style.transform=`scale(${.7+t*.3})`,0);
+ $('rings').style.opacity=.25+t*.75;
+ $('mer').style.transform=`scaleY(${.02+t*.98})`;}
+function update(){
+ const raw=v.value.trim().replace(',','.'),x=parseFloat(raw);
+ err.textContent='';all.innerHTML='';
+ if(raw===''||isNaN(x)||!/^[-+]?\d*\.?\d+(e[-+]?\d+)?$/i.test(raw)){out.value='';big.textContent='';err.textContent=raw===''?'':'Enter a valid number.';return}
+ if(cat==='Temperature'&&toK[from.value](x)<0){out.value='';big.textContent='';err.textContent='That is below absolute zero.';return}
+ const r=conv(cat,x,from.value,to.value);
+ out.value=fmt(r);big.innerHTML=`${fmt(x)} ${from.value} = ${fmt(r)} <small>${to.value}</small>`;
+ drive(level(x));
+ Object.entries(DATA[cat].units).forEach(([u,[,n]])=>{
+  const b=document.createElement('button');if(u===to.value)b.className='sel';
+  b.innerHTML=`<b>${fmt(conv(cat,x,from.value,u))}</b><span>${u} – ${n}</span>`;
+  b.onclick=()=>{to.value=u;update()};all.appendChild(b)});
+}
+v.addEventListener('input',update);from.onchange=update;to.onchange=update;
+$('swap').onclick=()=>{const f=from.value;from.value=to.value;to.value=f;if(out.value)v.value=out.value;update()};
+out.addEventListener('focus',()=>out.select());
+setCat('Length');
+</script>
+</body>
+</html>
