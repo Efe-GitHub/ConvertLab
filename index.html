@@ -52,6 +52,34 @@ h3{font-size:18px;margin:30px 0 12px}
 footer{margin-top:36px;color:var(--mute);font-size:14px}
 @media(max-width:760px){.stage{grid-template-columns:1fr}.logo p{display:none}.scope{min-height:320px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+#plans{margin-top:48px}
+#plans h3{font-size:clamp(26px,4vw,36px);font-weight:800;letter-spacing:-.03em;margin:0 0 6px}
+#plans .lead{color:var(--mute);margin:0 0 18px;max-width:520px}
+.bill{display:inline-flex;background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:4px;margin-bottom:18px}
+.bill button{font:inherit;font-weight:600;border:none;background:transparent;color:var(--ink);padding:8px 18px;border-radius:999px;cursor:pointer}
+.bill button[aria-pressed=true]{background:var(--ink);color:#fff}
+.bill em{font-style:normal;color:var(--acc);font-weight:800;margin-left:4px}
+.bill button[aria-pressed=true] em{color:#fff;opacity:.9}
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:stretch}
+.plan{background:var(--panel);border-radius:28px;padding:28px;display:flex;flex-direction:column;border:2px solid var(--line)}
+.plan.pro{background:var(--ink);color:#fff;border-color:var(--ink);position:relative}
+.plan h4{margin:0;font-size:22px;font-weight:800}
+.badge{position:absolute;top:22px;right:22px;background:var(--acc);color:#fff;font-size:13px;font-weight:800;padding:5px 12px;border-radius:999px;transition:background .5s}
+.price{font-size:clamp(40px,6vw,56px);font-weight:800;letter-spacing:-.04em;margin:10px 0 0;line-height:1}
+.price small{font-size:17px;font-weight:600;letter-spacing:0;opacity:.7}
+.note{margin:4px 0 18px;opacity:.7;font-size:14px;min-height:20px}
+.plan ul{list-style:none;padding:0;margin:0 0 24px;display:grid;gap:10px;flex:1}
+.plan li{padding-left:28px;position:relative;line-height:1.35}
+.plan li::before{content:'✓';position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:var(--acc);color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center;transition:background .5s}
+.plan li.off{opacity:.45}.plan li.off::before{content:'–';background:var(--line);color:var(--mute)}
+.plan .cta{font:inherit;font-weight:800;font-size:17px;padding:14px;border-radius:14px;border:2px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
+.plan .cta:hover{background:var(--ink);color:#fff}
+.plan.pro .cta{background:var(--acc);border-color:var(--acc);color:#fff;transition:background .5s,transform .15s}
+.plan.pro .cta:hover{transform:translateY(-2px)}
+.plan.pro :focus-visible{outline-color:#fff}
+#demo{min-height:24px;margin:14px 0 0;color:var(--mute);font-size:14px}
+@media(max-width:760px){.plans{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -108,6 +136,48 @@ footer{margin-top:36px;color:var(--mute);font-size:14px}
 
   <h3>Same value, every unit</h3>
   <div class="grid" id="all"></div>
+  <section id="plans" aria-labelledby="plans-h">
+    <h3 id="plans-h">Choose your plan</h3>
+    <p class="lead">Start free. Upgrade when you need more categories, saved history and bulk tools.</p>
+    <div class="bill" role="group" aria-label="Billing period">
+      <button id="bm" aria-pressed="true">Monthly</button>
+      <button id="by" aria-pressed="false">Yearly <em>Save 20%</em></button>
+    </div>
+    <div class="plans">
+      <article class="plan">
+        <h4>Free</h4>
+        <p class="price">$0 <small>forever</small></p>
+        <p class="note">No account needed.</p>
+        <ul>
+          <li>Length, Mass, Pressure, Energy, Temperature</li>
+          <li>Instant conversion with live instruments</li>
+          <li>Every-unit comparison view</li>
+          <li class="off">More categories (Speed, Volume, Area, Time, Data)</li>
+          <li class="off">Conversion history and favorites</li>
+          <li class="off">Bulk CSV conversion</li>
+        </ul>
+        <button class="cta" id="free">Keep using free</button>
+      </article>
+      <article class="plan pro">
+        <span class="badge">Most popular</span>
+        <h4>Pro</h4>
+        <p class="price" id="pp">$5 <small id="pu">/ month</small></p>
+        <p class="note" id="pn">Cancel anytime.</p>
+        <ul>
+          <li>Everything in Free</li>
+          <li>Speed, Volume, Area, Time and Data categories</li>
+          <li>Saved history and favorite conversions</li>
+          <li>Precision control (2 to 15 digits)</li>
+          <li>Bulk conversion: upload and download CSV</li>
+          <li>Dark mode and extra color themes</li>
+          <li>No ads</li>
+        </ul>
+        <button class="cta" id="upgrade">Upgrade to Pro</button>
+      </article>
+    </div>
+    <p id="demo" role="status" aria-live="polite"></p>
+  </section>
+
   <footer>Click any unit to make it the target. ConvertLab runs fully in your browser.</footer>
 </div>
 <script>
@@ -165,6 +235,13 @@ function update(){
 v.addEventListener('input',update);from.onchange=update;to.onchange=update;
 $('swap').onclick=()=>{const f=from.value;from.value=to.value;to.value=f;if(out.value)v.value=out.value;update()};
 out.addEventListener('focus',()=>out.select());
+let yearly=false;
+function bill(y){yearly=y;$('bm').setAttribute('aria-pressed',!y);$('by').setAttribute('aria-pressed',y);
+ $('pp').firstChild.textContent=y?'$48 ':'$5 ';$('pu').textContent=y?'/ year':'/ month';
+ $('pn').textContent=y?'That is $4 a month. Cancel anytime.':'Cancel anytime.';}
+$('bm').onclick=()=>bill(false);$('by').onclick=()=>bill(true);
+$('free').onclick=()=>{window.scrollTo({top:0,behavior:'smooth'});$('demo').textContent=''};
+$('upgrade').onclick=()=>{$('demo').textContent=`Demo only: no payment is taken. Billing for the ${yearly?'yearly':'monthly'} plan is not connected yet.`};
 setCat('Length');
 </script>
 </body>
